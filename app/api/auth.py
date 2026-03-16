@@ -8,7 +8,7 @@ import os
 
 from app.core import security
 from app.core.config import settings
-from app.db import models
+from models import User, UserProfile
 from app.db.session import get_db
 from app.schemas.user import Token, TokenPayload, UserCreate, UserRead
 
@@ -23,7 +23,7 @@ GOOGLE_REDIRECT_URI = settings.GOOGLE_REDIRECT_URI
 
 
 def get_user_by_email(db: Session, email: str):
-    return db.query(models.User).filter(models.User.email == email).first()
+    return db.query(User).filter(User.email == email).first()
 
 
 def authenticate_user(db: Session, email: str, password: str):
@@ -41,7 +41,7 @@ def signup(user_in: UserCreate, db: Session = Depends(get_db)):
     if existing:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
 
-    user = models.User(
+    user = User(
         email=user_in.email,
         name=user_in.name,
         password_hash=security.hash_password(user_in.password),
@@ -51,7 +51,7 @@ def signup(user_in: UserCreate, db: Session = Depends(get_db)):
     db.refresh(user)
 
     # create empty profile
-    profile = models.UserProfile(user_id=user.id)
+    profile = UserProfile(user_id=user.id)
     db.add(profile)
     db.commit()
 
@@ -86,7 +86,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     if not token_data.sub:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
-    user = db.query(models.User).get(int(token_data.sub))
+    user = db.query(User).get(int(token_data.sub))
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
     return user
@@ -129,11 +129,11 @@ def google_dev_login(db: Session = Depends(get_db)):
 
     user = get_user_by_email(db, dev_email)
     if not user:
-        user = models.User(email=dev_email, password_hash="", name=dev_name)
+        user = User(email=dev_email, password_hash="", name=dev_name)
         db.add(user)
         db.commit()
         db.refresh(user)
-        profile = models.UserProfile(user_id=user.id)
+        profile = UserProfile(user_id=user.id)
         db.add(profile)
         db.commit()
 
@@ -190,7 +190,7 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
 
         if not user:
             # Create new user
-            user = models.User(
+            user = User(
                 email=email,
                 password_hash="",  # No password for OAuth users
                 name=name,
@@ -200,7 +200,7 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
             db.refresh(user)
 
             # Create empty profile
-            profile = models.UserProfile(user_id=user.id)
+            profile = UserProfile(user_id=user.id)
             db.add(profile)
             db.commit()
 

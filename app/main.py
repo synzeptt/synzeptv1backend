@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import auth, chat, profiles, memories, ideas, goals
 from app.core.config import settings
-from app.db.models import Base
+from models import Base
 from app.db.session import engine
 
 
