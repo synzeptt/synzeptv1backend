@@ -10,3 +10,4 @@ python-dotenv==1.0.0
 pydantic-settings==2.13.1
 authlib==1.2.1
 httpx==0.25.0
+google-generativeai

@@ -58,9 +58,9 @@ class Conversation(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    role = Column(String, nullable=False)  # user | assistant
-    message = Column(Text, nullable=False)
-    timestamp = Column(DateTime, default=datetime.utcnow)
+    message = Column(String, nullable=False)
+    response = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="conversations")
 
@@ -70,9 +70,9 @@ class Memory(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    type = Column(SqlEnum(MemoryType), nullable=False)
-    content = Column(Text, nullable=False)
-    timestamp = Column(DateTime, default=datetime.utcnow)
+    content = Column(String, nullable=False)
+    memory_type = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="memories")
 
@@ -81,10 +81,10 @@ class Idea(Base):
     __tablename__ = "ideas"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     title = Column(String, nullable=False)
-    description = Column(Text, nullable=True)
-    timestamp = Column(DateTime, default=datetime.utcnow)
+    description = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="ideas")
 
@@ -95,7 +95,8 @@ class Goal(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     title = Column(String, nullable=False)
-    status = Column(SqlEnum(GoalStatus), default=GoalStatus.pending, nullable=False)
+    description = Column(String, nullable=True)
+    status = Column(String, default="pending", nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="goals")
