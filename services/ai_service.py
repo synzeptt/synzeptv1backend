@@ -22,7 +22,7 @@ def generate_ai_response(message: str) -> str:
         messages=[
             {
                 "role": "system",
-                "content": "You are Synzept, an AI thinking partner that helps users organize ideas and goals.",
+                "content": "You are Synzept, an AI thinking partner helping users organize ideas and goals.",
             },
             {"role": "user", "content": message},
         ],
