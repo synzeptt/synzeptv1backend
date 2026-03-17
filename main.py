@@ -4,6 +4,7 @@ import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 import google.generativeai as genai
 
@@ -40,16 +41,18 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS configuration
-allowed_origins = [o.strip() for o in settings.CORS_ORIGINS.split(",") if o.strip()]
-
+# CORS middleware (must be directly after app creation)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.options("/{full_path:path}")
+async def options_handler(full_path: str):
+    return Response(status_code=200)
 
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(profiles.router, prefix="/api/profile", tags=["profile"])
