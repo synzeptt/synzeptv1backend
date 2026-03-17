@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.api.auth import get_current_user
 from models import Conversation, Memory
 from app.db.session import get_db
 from app.schemas.chat import ChatRequest, ChatResponse, ConversationItem
+from services.ai_service import generate_ai_response
 
 router = APIRouter()
 
@@ -26,8 +27,10 @@ def chat(request: ChatRequest, user=Depends(get_current_user), db: Session = Dep
     db.add(user_msg)
     db.commit()
 
-    # For MVP, echo back the message and store as a dummy memory if it contains keywords.
-    response_text = f"I heard you say: {request.message}"
+    try:
+        response_text = generate_ai_response(request.message)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
     # Simple memory extraction: if user mentions "goal" or "idea" we'll store it.
     memory_saved = False

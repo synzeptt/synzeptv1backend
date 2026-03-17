@@ -184,13 +184,14 @@ def chat(request: ChatRequest, db: Session = Depends(get_db)):
     try:
         response_text = generate_ai_response(request.message)
     except Exception as e:
-        raise HTTPException(status_code=500, detail="AI service error")
+        raise HTTPException(status_code=500, detail=str(e))
     
     # Store conversation
     conv = Conversation(user_id=request.user_id, message=request.message, response=response_text)
     db.add(conv)
     db.commit()
-    return {"response": response_text, "memory_extracted": True}
+    # memory_extracted is not implemented in this endpoint; keep a stable false.
+    return {"response": response_text, "memory_extracted": False}
 
 
 @app.get("/conversations", response_model=list[ConversationResponse])
