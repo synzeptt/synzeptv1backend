@@ -7,22 +7,21 @@ def generate_ai_response(message: str) -> str:
 
     Provider:
     - Groq
-    - Model: llama3-70b-8192
+    - Model: llama-3.3-70b-versatile
     - Env var: GROQ_API_KEY
     """
-    api_key = os.getenv("GROQ_API_KEY")
-    if not api_key:
+    if not os.getenv("GROQ_API_KEY"):
         raise RuntimeError("Missing GROQ_API_KEY")
 
     from groq import Groq
 
-    client = Groq(api_key=api_key)
+    client = Groq(api_key=os.getenv("GROQ_API_KEY"))
     completion = client.chat.completions.create(
-        model="llama3-70b-8192",
+        model="llama-3.3-70b-versatile",
         messages=[
             {
                 "role": "system",
-                "content": "You are Synzept, an AI thinking partner helping users organize ideas and goals.",
+                "content": "You are Synzept, an AI thinking partner that helps users organize ideas and goals.",
             },
             {"role": "user", "content": message},
         ],
