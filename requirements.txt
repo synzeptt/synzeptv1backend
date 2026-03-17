@@ -11,3 +11,4 @@ pydantic-settings==2.13.1
 authlib==1.2.1
 httpx==0.25.0
 google-generativeai
+email-validator
